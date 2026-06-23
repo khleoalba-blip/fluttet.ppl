@@ -69,7 +69,8 @@ class JornadaModel {
       aperturaFecha: json['aperturaFecha'] as String?,
       cierreHora: json['cierreHora'] as String?,
       cierreFecha: json['cierreFecha'] as String?,
-      totalRecaudado: (json['totalRecaudado'] as num?)?.toDouble() ?? 0.0,
+      totalRecaudado: (json['totalRecaudado'] as num?)?.toDouble() ??
+          (json['recaudadoTotal'] as num?)?.toDouble() ?? 0.0,
       recaudadoTotal: (json['recaudadoTotal'] as num?)?.toDouble() ?? 0.0,
       resumen: json['resumen'] as String? ?? '',
       pick3: json['pick3'] as String? ?? '',
