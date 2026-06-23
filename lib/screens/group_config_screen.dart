@@ -130,13 +130,7 @@ class _GroupConfigScreenState extends State<GroupConfigScreen> {
           _buildLotterySelector(theme),
           const SizedBox(height: 20),
 
-          // Modo
-          _buildSectionTitle(theme, 'Modo de Operación'),
-          const SizedBox(height: 8),
-          _buildModeSelector(theme),
-          const SizedBox(height: 20),
-
-          // Switch jornada automática
+          // Modo de Operación (solo jornada automática)
           SwitchListTile(
             title: const Text('Jornada Automática'),
             subtitle: const Text(
@@ -183,7 +177,8 @@ class _GroupConfigScreenState extends State<GroupConfigScreen> {
                 ? '${group.id.substring(0, 20)}...' : group.id),
             _infoRow(theme, 'Admin', '+${group.adminPhone}'),
             _infoRow(theme, 'Miembros', '${group.memberCount}'),
-            _infoRow(theme, 'Listeros', '${group.listeroCount}'),
+            _infoRow(theme, 'Listeros', '${group.listeroCount} (${group.listerosActivos} activos)'),
+            _infoRow(theme, 'Banca', group.tieneBanca ? '✅ Configurada' : '❌ No configurada'),
             if (group.jornadaActivaId != null) ...[
               const SizedBox(height: 4),
               Container(

@@ -59,7 +59,7 @@ class JornadaModel {
       resumen: json['resumen'] as String? ?? '',
       pick3: json['pick3'] as String? ?? '',
       pick4: json['pick4'] as String? ?? '',
-      premiosProcesados: json['premiosProcesados'] as int? ?? 0,
+      premiosProcesados: _parseIntOrBool(json['premiosProcesados']),
       listerosCount: json['listerosCount'] as int? ?? 0,
       totalPremios: (json['totalPremios'] as num?)?.toDouble() ?? 0.0,
     );
@@ -69,6 +69,14 @@ class JornadaModel {
     if (value == null) return null;
     if (value is String) return DateTime.tryParse(value);
     return null;
+  }
+
+  static int _parseIntOrBool(dynamic value) {
+    if (value == null) return 0;
+    if (value is bool) return value ? 1 : 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 
   Map<String, dynamic> toJson() {
