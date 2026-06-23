@@ -53,8 +53,8 @@ class JornadaCard extends StatelessWidget {
                   _buildInfoText(
                     context,
                     Icons.calendar_today,
-                    jornada.fechaCreacion != null
-                        ? dateFormat.format(jornada.fechaCreacion!)
+                    jornada.fechaApertura != null
+                        ? dateFormat.format(jornada.fechaApertura!)
                         : '—',
                   ),
                   const SizedBox(width: 16),

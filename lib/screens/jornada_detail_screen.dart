@@ -105,9 +105,9 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
                               _buildDetailRow(
                                 theme,
                                 'Creada',
-                                jornada.fechaCreacion != null
+                                jornada.fechaApertura != null
                                     ? dateFormat
-                                        .format(jornada.fechaCreacion!)
+                                        .format(jornada.fechaApertura!)
                                     : '—',
                                 Icons.calendar_today,
                               ),
