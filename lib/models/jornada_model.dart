@@ -7,14 +7,20 @@ class JornadaModel {
   final List<PremioEntry> premios; // Prize results
   final DateTime? fechaApertura;
   final DateTime? fechaCierre;
-  final DateTime? fechaCreacion;
+  final String? aperturaHora;
+  final String? aperturaFecha;
+  final String? cierreHora;
+  final String? cierreFecha;
   final double totalRecaudado;
+  final double recaudadoTotal;
   final String resumen;
-  final String pick3; // Pick 3 result
-  final String pick4; // Pick 4 result
+  final String pick3;
+  final String pick4;
   final int premiosProcesados;
   final int listerosCount;
+  final int mensajesCount;
   final double totalPremios;
+  final Map<String, double> jugadasPorListero;
 
   JornadaModel({
     required this.id,
@@ -25,14 +31,20 @@ class JornadaModel {
     this.premios = const [],
     this.fechaApertura,
     this.fechaCierre,
-    this.fechaCreacion,
+    this.aperturaHora,
+    this.aperturaFecha,
+    this.cierreHora,
+    this.cierreFecha,
     this.totalRecaudado = 0.0,
+    this.recaudadoTotal = 0.0,
     this.resumen = '',
     this.pick3 = '',
     this.pick4 = '',
     this.premiosProcesados = 0,
     this.listerosCount = 0,
+    this.mensajesCount = 0,
     this.totalPremios = 0.0,
+    this.jugadasPorListero = const {},
   });
 
   factory JornadaModel.fromJson(Map<String, dynamic> json) {
@@ -51,17 +63,24 @@ class JornadaModel {
               .map((p) => PremioEntry.fromJson(p as Map<String, dynamic>))
               .toList()
           : [],
-      fechaApertura: _parseDate(json['inicio']) ?? _parseDate(json['fechaApertura']),
-      fechaCierre: _parseDate(json['fin']) ?? _parseDate(json['fechaCierre']),
-      fechaCreacion: _parseDate(json['fechaCreacion']),
-      totalRecaudado:
-          (json['totalRecaudado'] as num?)?.toDouble() ?? 0.0,
+      fechaApertura: _parseDate(json['inicioReal']) ?? _parseDate(json['inicio']) ?? _parseDate(json['fechaApertura']),
+      fechaCierre: _parseDate(json['finReal']) ?? _parseDate(json['fin']) ?? _parseDate(json['fechaCierre']),
+      aperturaHora: json['aperturaHora'] as String?,
+      aperturaFecha: json['aperturaFecha'] as String?,
+      cierreHora: json['cierreHora'] as String?,
+      cierreFecha: json['cierreFecha'] as String?,
+      totalRecaudado: (json['totalRecaudado'] as num?)?.toDouble() ?? 0.0,
+      recaudadoTotal: (json['recaudadoTotal'] as num?)?.toDouble() ?? 0.0,
       resumen: json['resumen'] as String? ?? '',
       pick3: json['pick3'] as String? ?? '',
       pick4: json['pick4'] as String? ?? '',
       premiosProcesados: _parseIntOrBool(json['premiosProcesados']),
       listerosCount: json['listerosCount'] as int? ?? 0,
+      mensajesCount: json['mensajesCount'] as int? ?? 0,
       totalPremios: (json['totalPremios'] as num?)?.toDouble() ?? 0.0,
+      jugadasPorListero: json['jugadasPorListero'] is Map
+          ? (json['jugadasPorListero'] as Map).map((k, v) => MapEntry(k.toString(), (v as num).toDouble()))
+          : {},
     );
   }
 
