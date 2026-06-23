@@ -5,7 +5,6 @@ import '../models/jornada_model.dart';
 import '../providers/jornadas_provider.dart';
 import '../widgets/loading_overlay.dart';
 import '../widgets/status_badge.dart';
-import '../widgets/status_badge.dart';
 
 class JornadaDetailScreen extends StatefulWidget {
   const JornadaDetailScreen({super.key});
@@ -41,7 +40,6 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
     final theme = Theme.of(context);
     final provider = context.watch<JornadasProvider>();
     final jornada = provider.selectedJornada ?? _initialJornada;
-    final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
     return Scaffold(
       appBar: AppBar(
@@ -63,263 +61,24 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header status card
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Jornada ${jornada.turnoLabel}',
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  StatusBadge(
-                                      estado: jornada.estado,
-                                      fontSize: 12),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Icon(Icons.category,
-                                      size: 16,
-                                      color: theme
-                                          .colorScheme.onSurfaceVariant),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    jornada.lottery.isNotEmpty
-                                        ? jornada.lottery.toUpperCase()
-                                        : 'Sin tipo',
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                              if (jornada.mensajesCount > 0) ...[
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(Icons.message,
-                                        size: 14,
-                                        color: theme.colorScheme.onSurfaceVariant),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${jornada.mensajesCount} mensajes',
-                                      style: theme.textTheme.bodySmall,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              const Divider(height: 24),
-                              _buildDetailRow(
-                                theme,
-                                'Apertura',
-                                jornada.aperturaFecha != null
-                                    ? jornada.aperturaFecha!
-                                    : jornada.fechaApertura != null
-                                        ? dateFormat.format(jornada.fechaApertura!)
-                                        : '—',
-                                Icons.play_arrow,
-                              ),
-                              const SizedBox(height: 8),
-                              _buildDetailRow(
-                                theme,
-                                'Cierre',
-                                jornada.cierreFecha != null
-                                    ? jornada.cierreFecha!
-                                    : jornada.fechaCierre != null
-                                        ? dateFormat.format(jornada.fechaCierre!)
-                                        : '—',
-                                Icons.stop,
-                              ),
-                              const SizedBox(height: 8),
-                              _buildDetailRow(
-                                theme,
-                                'Recaudado',
-                                '\$${jornada.totalRecaudado.toStringAsFixed(2)}',
-                                Icons.attach_money,
-                              ),
-                              if (jornada.listerosCount > 0) ...[
-                                const SizedBox(height: 4),
-                                _buildDetailRow(
-                                  theme,
-                                  'Listeros',
-                                  '${jornada.listerosCount} activos',
-                                  Icons.people,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
+                      // ━━━ HEADER: ESTADO DEL GRUPO ━━━
+                      _buildStatusHeader(theme, jornada),
                       const SizedBox(height: 16),
 
-                      // Results section
-                      if (jornada.premios.isNotEmpty) ...[
-                        Text(
-                          'Resultados',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              children: jornada.premios.map((premio) {
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor:
-                                        theme.colorScheme.primaryContainer,
-                                    child: Text(
-                                      premio.numero,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: theme.colorScheme
-                                            .onPrimaryContainer,
-                                      ),
-                                    ),
-                                  ),
-                                  title: Text(premio.premio),
-                                  trailing: Text(
-                                    '\$${premio.monto.toStringAsFixed(2)}',
-                                    style:
-                                        theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                      // ━━━ JORNADA ACTIVA ━━━
+                      _buildJornadaCard(theme, jornada),
+                      const SizedBox(height: 16),
 
-                      // Picks / Jugadas section
-                      Text(
-                        'Jugadas (${jornada.picks.length})',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+                      // ━━━ JUGADAS REGISTRADAS ━━━
+                      _buildJugadasSection(theme, jornada),
 
-                      if (jornada.picks.isEmpty)
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Center(
-                              child: Text(
-                                'No hay jugadas registradas',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme
-                                      .colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        ...jornada.picks.map((pick) {
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 6),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue.withOpacity(0.1),
-                                child: Text(
-                                  pick.numero,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                              title: Text(
-                                pick.ubicacion.isNotEmpty
-                                    ? 'Posición: ${pick.ubicacion}'
-                                    : 'Sin posición',
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                              subtitle: pick.listero.isNotEmpty
-                                  ? Text('Listero: ${pick.listero}')
-                                  : null,
-                              trailing: Text(
-                                '\$${pick.monto.toStringAsFixed(2)}',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
+                      // ━━━ RESULTADOS (PICK3/PICK4) ━━━
+                      if (jornada.pick3.isNotEmpty || jornada.pick4.isNotEmpty)
+                        _buildResultadosSection(theme, jornada),
 
-                      // Por Listero summary
-                      if (jornada.jugadasPorListero.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          'Por Listero',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              children: jornada.jugadasPorListero.entries.map((e) {
-                                return ListTile(
-                                  dense: true,
-                                  leading: CircleAvatar(
-                                    radius: 14,
-                                    backgroundColor: Colors.green.withOpacity(0.1),
-                                    child: const Icon(Icons.person, size: 16, color: Colors.green),
-                                  ),
-                                  title: Text(e.key, style: theme.textTheme.bodyMedium),
-                                  trailing: Text(
-                                    '\$${e.value.toStringAsFixed(2)}',
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-
-                      // Resumen section
-                      if (jornada.resumen.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          'Resumen',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(
-                              jornada.resumen,
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                          ),
-                        ),
-                      ],
+                      // ━━━ PREMIOS ━━━
+                      if (jornada.premios.isNotEmpty)
+                        _buildPremiosSection(theme, jornada),
 
                       const SizedBox(height: 32),
                     ],
@@ -330,26 +89,388 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
     );
   }
 
-  Widget _buildDetailRow(
-      ThemeData theme, String label, String value, IconData icon) {
-    return Row(
+  // ══════════════════════════════════════════════════
+  // HEADER: Copia exacta del .status
+  // ══════════════════════════════════════════════════
+  Widget _buildStatusHeader(ThemeData theme, JornadaModel jornada) {
+    final backgroundColor = jornada.isActive
+        ? Colors.green.withOpacity(0.08)
+        : theme.colorScheme.surfaceVariant.withOpacity(0.5);
+
+    return Card(
+      color: backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            Center(
+              child: Text(
+                '📊 ESTADO DEL GRUPO',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+            const Divider(height: 20),
+            // Admin
+            _statusRow(theme, '👤 Admin:', '—', Icons.admin_panel_settings),
+            const SizedBox(height: 4),
+            // Lotería
+            _statusRow(theme, '🎰 Lotería:', jornada.lottery.isNotEmpty ? jornada.lottery : 'Florida', Icons.casino),
+            const SizedBox(height: 4),
+            // Automático
+            _statusRow(theme, '🤖 Automático:', '✅ Activado', Icons.smart_toy),
+            const SizedBox(height: 4),
+            // Banca
+            _statusRow(theme, '🏦 Banca:', '—', Icons.account_balance),
+            const SizedBox(height: 4),
+            // Listeros
+            _statusRow(theme, '📋 Listeros:', '${jornada.listerosCount} registrados', Icons.people),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════
+  // JORNADA CARD: ID, Lotería, Turno, Horarios
+  // ══════════════════════════════════════════════════
+  Widget _buildJornadaCard(ThemeData theme, JornadaModel jornada) {
+    final emoji = jornada.turno == 'mañana' ? '☀️' : '🌇';
+    final color = jornada.isActive ? Colors.green : Colors.blueGrey;
+
+    return Card(
+      color: color.withOpacity(0.06),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: color.withOpacity(0.3)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title row
+            Row(
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 22)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Jornada ${jornada.isActive ? "🟢 ACTIVA" : "🔴 ${jornada.estado.toUpperCase()}"}',
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+            // ID
+            _jornadaInfoRow(theme, '🆔', 'ID:', jornada.id.isNotEmpty ? jornada.id : '—'),
+            const SizedBox(height: 4),
+            // Lotería + Turno
+            _jornadaInfoRow(theme, '🎰', 'Lotería:', '${jornada.lottery.isNotEmpty ? jornada.lottery : "Florida"} | $emoji ${jornada.turno}'),
+            const SizedBox(height: 4),
+            // Apertura
+            _jornadaInfoRow(
+              theme,
+              '⏰',
+              'Inicio real:',
+              jornada.aperturaHora != null
+                  ? jornada.aperturaHora!
+                  : jornada.aperturaFecha != null
+                      ? jornada.aperturaFecha!
+                      : '—',
+            ),
+            const SizedBox(height: 4),
+            // Cierre prog
+            _jornadaInfoRow(theme, '⏰', 'Cierre prog.:', '—'),
+            const SizedBox(height: 4),
+            // Resultados
+            _jornadaInfoRow(theme, '🎯', 'Resultados:', '—'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════
+  // JUGADAS REGISTRADAS
+  // ══════════════════════════════════════════════════
+  Widget _buildJugadasSection(ThemeData theme, JornadaModel jornada) {
+    final detalle = jornada.listerosDetalle;
+    final hasData = detalle.isNotEmpty;
+
+    // Calcular total
+    double totalAcumulado = 0;
+    for (final d in detalle.values) {
+      totalAcumulado += d.total;
+    }
+    if (totalAcumulado == 0 && jornada.totalRecaudado > 0) {
+      totalAcumulado = jornada.totalRecaudado;
+    }
+
+    // Listeros que enviaron
+    final listerosQueEnviaron = detalle.keys.toSet();
+    if (listerosQueEnviaron.isEmpty && jornada.jugadasPorListero.isNotEmpty) {
+      listerosQueEnviaron.addAll(jornada.jugadasPorListero.keys);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 90,
-          child: Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+        Text(
+          '👥 Jugadas registradas',
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const Divider(),
+        // Mensajes
+        _jugadaInfoRow(theme, '📩', 'Mensajes:', '${jornada.mensajesCount}'),
+        const SizedBox(height: 2),
+        // Listeros que enviaron
+        _jugadaInfoRow(theme, '👤', 'Listeros que enviaron:', '${listerosQueEnviaron.length}'),
+        const SizedBox(height: 8),
+
+        if (!hasData && jornada.mensajesCount == 0)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: Text(
+                  'No hay jugadas registradas',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+          )
+        else ...[
+          // Per-listero breakdown cards
+          ...detalle.entries.map((entry) {
+            final nombre = entry.key;
+            final d = entry.value;
+            return Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              color: Colors.green.withOpacity(0.05),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name + total
+                    Row(
+                      children: [
+                        const Text('🟢 ', style: TextStyle(fontSize: 16)),
+                        Expanded(
+                          child: Text(
+                            '$nombre: ${d.total.toStringAsFixed(0)} CUP',
+                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Category breakdown
+                    if (d.categorias.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 22),
+                        child: Text(
+                          d.categorias.entries
+                              .map((c) => '${c.key}: ${c.value.toStringAsFixed(0)}')
+                              .join(' | '),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          }),
+          // Total acumulado
+          const Divider(),
+          _jugadaInfoRow(
+            theme,
+            '💰',
+            'Total acumulado:',
+            '${totalAcumulado.toStringAsFixed(0)} CUP',
+            bold: true,
+          ),
+        ],
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════
+  // RESULTADOS: PICK3 / PICK4
+  // ══════════════════════════════════════════════════
+  Widget _buildResultadosSection(ThemeData theme, JornadaModel jornada) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          '🎯 Resultados',
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const Divider(),
+        Card(
+          color: Colors.amber.withOpacity(0.08),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (jornada.pick3.isNotEmpty)
+                  _resultadoBox(theme, 'PICK 3', jornada.pick3, Colors.orange),
+                if (jornada.pick4.isNotEmpty)
+                  _resultadoBox(theme, 'PICK 4', jornada.pick4, Colors.deepPurple),
+              ],
             ),
           ),
         ),
-        Expanded(
+      ],
+    );
+  }
+
+  Widget _resultadoBox(ThemeData theme, String label, String numbers, Color color) {
+    return Column(
+      children: [
+        Text(label, style: theme.textTheme.labelSmall),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: color.withOpacity(0.4)),
+          ),
           child: Text(
-            value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
+            numbers,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+              letterSpacing: 4,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════
+  // PREMIOS
+  // ══════════════════════════════════════════════════
+  Widget _buildPremiosSection(ThemeData theme, JornadaModel jornada) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          '🏆 Premios',
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const Divider(),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: jornada.premios.map((premio) {
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    child: Text(
+                      premio.numero,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                  title: Text(premio.premio),
+                  trailing: Text(
+                    '\$${premio.monto.toStringAsFixed(2)}',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ══════════════════════════════════════════════════
+  // HELPERS
+  // ══════════════════════════════════════════════════
+  Widget _statusRow(ThemeData theme, String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: theme.textTheme.bodyMedium,
+              children: [
+                TextSpan(text: label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                const TextSpan(text: ' '),
+                TextSpan(text: value),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _jornadaInfoRow(ThemeData theme, String emoji, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 14)),
+        const SizedBox(width: 6),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: theme.textTheme.bodyMedium,
+              children: [
+                TextSpan(text: '$label ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                TextSpan(text: value),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _jugadaInfoRow(ThemeData theme, String emoji, String label, String value, {bool bold = false}) {
+    return Row(
+      children: [
+        Text(emoji, style: const TextStyle(fontSize: 14)),
+        const SizedBox(width: 6),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: bold ? FontWeight.bold : null,
+              ),
+              children: [
+                TextSpan(text: '$label ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                TextSpan(text: value),
+              ],
             ),
           ),
         ),

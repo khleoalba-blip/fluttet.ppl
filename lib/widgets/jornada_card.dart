@@ -71,7 +71,7 @@ class JornadaCard extends StatelessWidget {
                   _buildInfoText(
                     context,
                     Icons.receipt_long,
-                    '${jornada.picks.length} jugadas',
+                    '${jornada.mensajesCount > 0 ? jornada.mensajesCount : jornada.picks.length} jugadas',
                   ),
                   const SizedBox(width: 16),
                   _buildInfoText(

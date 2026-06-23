@@ -21,6 +21,7 @@ class JornadaModel {
   final int mensajesCount;
   final double totalPremios;
   final Map<String, double> jugadasPorListero;
+  final Map<String, ListeroDetalle> listerosDetalle;
 
   JornadaModel({
     required this.id,
@@ -45,6 +46,7 @@ class JornadaModel {
     this.mensajesCount = 0,
     this.totalPremios = 0.0,
     this.jugadasPorListero = const {},
+    this.listerosDetalle = const {},
   });
 
   factory JornadaModel.fromJson(Map<String, dynamic> json) {
@@ -81,6 +83,9 @@ class JornadaModel {
       totalPremios: (json['totalPremios'] as num?)?.toDouble() ?? 0.0,
       jugadasPorListero: json['jugadasPorListero'] is Map
           ? (json['jugadasPorListero'] as Map).map((k, v) => MapEntry(k.toString(), (v as num).toDouble()))
+          : {},
+      listerosDetalle: json['listerosDetalle'] is Map
+          ? (json['listerosDetalle'] as Map).map((k, v) => MapEntry(k.toString(), ListeroDetalle.fromJson(v as Map<String, dynamic>)))
           : {},
     );
   }
@@ -196,5 +201,21 @@ class PremioEntry {
       'premio': premio,
       'monto': monto,
     };
+  }
+}
+
+class ListeroDetalle {
+  final double total;
+  final Map<String, double> categorias;
+
+  ListeroDetalle({required this.total, this.categorias = const {}});
+
+  factory ListeroDetalle.fromJson(Map<String, dynamic> json) {
+    return ListeroDetalle(
+      total: (json['total'] as num?)?.toDouble() ?? 0.0,
+      categorias: json['categorias'] is Map
+          ? (json['categorias'] as Map).map((k, v) => MapEntry(k.toString(), (v as num).toDouble()))
+          : {},
+    );
   }
 }
