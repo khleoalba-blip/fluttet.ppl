@@ -101,34 +101,41 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
                                   ),
                                 ],
                               ),
+                              if (jornada.mensajesCount > 0) ...[
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(Icons.message,
+                                        size: 14,
+                                        color: theme.colorScheme.onSurfaceVariant),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${jornada.mensajesCount} mensajes',
+                                      style: theme.textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ],
                               const Divider(height: 24),
                               _buildDetailRow(
                                 theme,
-                                'Creada',
-                                jornada.fechaApertura != null
-                                    ? dateFormat
-                                        .format(jornada.fechaApertura!)
-                                    : '—',
-                                Icons.calendar_today,
-                              ),
-                              const SizedBox(height: 8),
-                              _buildDetailRow(
-                                theme,
                                 'Apertura',
-                                jornada.fechaApertura != null
-                                    ? dateFormat
-                                        .format(jornada.fechaApertura!)
-                                    : '—',
+                                jornada.aperturaFecha != null
+                                    ? jornada.aperturaFecha!
+                                    : jornada.fechaApertura != null
+                                        ? dateFormat.format(jornada.fechaApertura!)
+                                        : '—',
                                 Icons.play_arrow,
                               ),
                               const SizedBox(height: 8),
                               _buildDetailRow(
                                 theme,
                                 'Cierre',
-                                jornada.fechaCierre != null
-                                    ? dateFormat
-                                        .format(jornada.fechaCierre!)
-                                    : '—',
+                                jornada.cierreFecha != null
+                                    ? jornada.cierreFecha!
+                                    : jornada.fechaCierre != null
+                                        ? dateFormat.format(jornada.fechaCierre!)
+                                        : '—',
                                 Icons.stop,
                               ),
                               const SizedBox(height: 8),
@@ -138,6 +145,15 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
                                 '\$${jornada.totalRecaudado.toStringAsFixed(2)}',
                                 Icons.attach_money,
                               ),
+                              if (jornada.listerosCount > 0) ...[
+                                const SizedBox(height: 4),
+                                _buildDetailRow(
+                                  theme,
+                                  'Listeros',
+                                  '${jornada.listerosCount} activos',
+                                  Icons.people,
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -246,6 +262,43 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
                             ),
                           );
                         }),
+
+                      // Por Listero summary
+                      if (jornada.jugadasPorListero.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          'Por Listero',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: jornada.jugadasPorListero.entries.map((e) {
+                                return ListTile(
+                                  dense: true,
+                                  leading: CircleAvatar(
+                                    radius: 14,
+                                    backgroundColor: Colors.green.withOpacity(0.1),
+                                    child: const Icon(Icons.person, size: 16, color: Colors.green),
+                                  ),
+                                  title: Text(e.key, style: theme.textTheme.bodyMedium),
+                                  trailing: Text(
+                                    '\$${e.value.toStringAsFixed(2)}',
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
 
                       // Resumen section
                       if (jornada.resumen.isNotEmpty) ...[
