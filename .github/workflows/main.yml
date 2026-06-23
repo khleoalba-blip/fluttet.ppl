@@ -3,10 +3,10 @@ name: Build and Release APK
 on:
   push:
     branches:
-      - master
+      
       - main
     paths:
-      - 'flutter_dashboard/**'
+      
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
