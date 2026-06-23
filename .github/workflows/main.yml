@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
@@ -13,7 +11,6 @@ jobs:
     name: Build and Release APK
     runs-on: ubuntu-latest
 
-   
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -28,7 +25,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: '3.24.x'
+          flutter-version: '3.24.5'
 
       - name: Install dependencies
         run: flutter pub get
@@ -40,7 +37,7 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Version: v$VERSION"
 
-      - name: Build all APKs
+      - name: Build all APKs (split per ABI)
         run: |
           mkdir -p release_apks
 
@@ -63,7 +60,7 @@ jobs:
       - name: Create/Update Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "flutter_dashboard/release_apks/*.apk"
+          artifacts: "release_apks/*.apk"
           tag: v${{ env.VERSION }}
           name: "ContadorPPL Dashboard v${{ env.VERSION }}"
           body: |
