@@ -174,7 +174,7 @@ class ApiService {
         'phone': phone,
         'nombre': name,
         'porciento': porciento,
-        'horarioPermitido': '00:00-23:59',
+        'horarioPermitido': 'ambos',
       },
     );
     return response as Map<String, dynamic>;
