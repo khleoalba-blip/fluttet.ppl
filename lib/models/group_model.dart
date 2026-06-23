@@ -2,16 +2,18 @@ class GroupModel {
   final String id;
   final String name;
   final String adminPhone;
-  final String lotteryType; // Florida, Charada, etc.
-  final String mode; // automatico, manual
+  final String lotteryType;
+  final String mode;
   final bool jornadaAutomatica;
   final String? jornadaActivaId;
   final GroupConfig config;
   final int listeroCount;
+  final int listerosActivos;
   final int activeJornadas;
   final int memberCount;
   final String? description;
   final bool isGroupBanca;
+  final bool tieneBanca;
 
   GroupModel({
     required this.id,
@@ -23,30 +25,34 @@ class GroupModel {
     this.jornadaActivaId,
     required this.config,
     this.listeroCount = 0,
+    this.listerosActivos = 0,
     this.activeJornadas = 0,
     this.memberCount = 0,
     this.description,
     this.isGroupBanca = false,
+    this.tieneBanca = false,
   });
 
   factory GroupModel.fromJson(Map<String, dynamic> json) {
-    // Mapeo de campos de la API del bot (español) al modelo Flutter
     return GroupModel(
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? 'Sin nombre',
       adminPhone: json['adminPhone'] as String? ?? '',
       lotteryType: json['loteriaActual'] as String? ?? 'Florida',
-      mode: json['modo'] as String? ?? 'manual',
+      mode: json['modo'] as String? ?? 'automatico',
       jornadaAutomatica: json['jornadaAutomatica'] as bool? ?? true,
       jornadaActivaId: json['jornadaActivaId'] as String?,
       config: GroupConfig.fromApiJson(json),
-      listeroCount: json['listerosRegistrados'] is List
-          ? (json['listerosRegistrados'] as List).length
-          : (json['listerosCount'] as int? ?? 0),
+      listeroCount: json['listerosCount'] as int? ?? 
+          (json['listerosRegistrados'] is List 
+              ? (json['listerosRegistrados'] as List).length 
+              : 0),
+      listerosActivos: json['listerosActivos'] as int? ?? 0,
       activeJornadas: json['jornadaActivaId'] != null ? 1 : 0,
       memberCount: json['memberCount'] as int? ?? 0,
       description: json['description'] as String?,
       isGroupBanca: json['isGroupBanca'] as bool? ?? false,
+      tieneBanca: json['tieneBanca'] as bool? ?? (json['bancoGroupJid'] != null),
     );
   }
 
@@ -71,8 +77,12 @@ class GroupModel {
     String? jornadaActivaId,
     GroupConfig? config,
     int? listeroCount,
+    int? listerosActivos,
     int? activeJornadas,
     int? memberCount,
+    String? description,
+    bool? isGroupBanca,
+    bool? tieneBanca,
   }) {
     return GroupModel(
       id: id ?? this.id,
@@ -84,8 +94,12 @@ class GroupModel {
       jornadaActivaId: jornadaActivaId ?? this.jornadaActivaId,
       config: config ?? this.config,
       listeroCount: listeroCount ?? this.listeroCount,
+      listerosActivos: listerosActivos ?? this.listerosActivos,
       activeJornadas: activeJornadas ?? this.activeJornadas,
       memberCount: memberCount ?? this.memberCount,
+      description: description ?? this.description,
+      isGroupBanca: isGroupBanca ?? this.isGroupBanca,
+      tieneBanca: tieneBanca ?? this.tieneBanca,
     );
   }
 }
