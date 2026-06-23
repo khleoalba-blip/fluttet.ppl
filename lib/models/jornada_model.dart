@@ -96,10 +96,27 @@ class JornadaModel {
     };
   }
 
-  String get turnoLabel => turno == 'mañana' ? 'Mañana' : 'Tarde';
+  String get turnoLabel {
+    switch (turno.toLowerCase()) {
+      case 'mañana': return '🌅 Mañana';
+      case 'tarde': return '🌇 Tarde';
+      default: return turno;
+    }
+  }
 
-  bool get isActive => estado == 'abierta' || estado == 'pendiente';
-  bool get isClosed => estado == 'cerrada' || estado == 'procesada';
+  String get estadoLabel {
+    switch (estado.toLowerCase()) {
+      case 'activa': return '🟢 Activa';
+      case 'abierta': return '🟢 Activa';
+      case 'cerrada': return '🔴 Cerrada';
+      case 'procesada': return '✅ Procesada';
+      case 'pendiente': return '⏳ Pendiente';
+      default: return estado;
+    }
+  }
+
+  bool get isActive => estado.toLowerCase() == 'activa' || estado.toLowerCase() == 'abierta' || estado == 'pendiente';
+  bool get isClosed => estado.toLowerCase() == 'cerrada' || estado.toLowerCase() == 'procesada';
 }
 
 class PickEntry {
