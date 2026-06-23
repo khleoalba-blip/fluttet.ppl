@@ -1,0 +1,87 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'flutter_dashboard/**'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Release APK
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: flutter_dashboard
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.24.x'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep 'version:' pubspec.yaml | head -1 | awk '{print $2}' | cut -d'+' -f1)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version: v$VERSION"
+
+      - name: Build all APKs
+        run: |
+          mkdir -p release_apks
+
+          echo "=== arm64-v8a (modernos) ==="
+          flutter build apk --release --target-platform android-arm64
+          cp build/app/outputs/flutter-apk/app-release.apk release_apks/ContadorPPL-v$VERSION-arm64-v8a.apk
+
+          echo "=== armeabi-v7a (32-bit) ==="
+          flutter build apk --release --target-platform android-arm
+          cp build/app/outputs/flutter-apk/app-release.apk release_apks/ContadorPPL-v$VERSION-armeabi-v7a.apk
+
+          echo "=== x86_64 (emuladores) ==="
+          flutter build apk --release --target-platform android-x64
+          cp build/app/outputs/flutter-apk/app-release.apk release_apks/ContadorPPL-v$VERSION-x86_64.apk
+
+          echo ""
+          echo "=== APKs generados ==="
+          ls -lh release_apks/
+
+      - name: Create/Update Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "flutter_dashboard/release_apks/*.apk"
+          tag: v${{ env.VERSION }}
+          name: "ContadorPPL Dashboard v${{ env.VERSION }}"
+          body: |
+            ## 📱 ContadorPPL Dashboard v${{ env.VERSION }}
+
+            🚀 Build automático desde `${{ github.ref_name }}`
+
+            | Arquitectura | Para |
+            |---|---|
+            | **arm64-v8a** | Teléfonos modernos (la mayoría) |
+            | **armeabi-v7a** | Dispositivos 32-bit |
+            | **x86_64** | Emuladores Android |
+          token: ${{ secrets.TOKEN }}
+          allowUpdates: true
+          removeArtifacts: true
+          makeLatest: true
