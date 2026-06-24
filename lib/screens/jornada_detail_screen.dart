@@ -186,10 +186,13 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
             ),
             const SizedBox(height: 4),
             // Cierre prog
-            _jornadaInfoRow(theme, '⏰', 'Cierre prog.:', '—'),
+            _jornadaInfoRow(theme, '⏰', 'Cierre prog.:', jornada.finProgramado ?? '—'),
             const SizedBox(height: 4),
-            // Resultados
-            _jornadaInfoRow(theme, '🎯', 'Resultados:', '—'),
+            // Cierre real
+            _jornadaInfoRow(theme, '⏰', 'Cierre real:', jornada.cierreHora ?? jornada.cierreFecha ?? '—'),
+            const SizedBox(height: 4),
+            // Resultados prog
+            _jornadaInfoRow(theme, '🎯', 'Resultados prog.:', jornada.resultadosProgramado ?? '—'),
           ],
         ),
       ),

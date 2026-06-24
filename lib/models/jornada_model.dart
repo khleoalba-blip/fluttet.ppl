@@ -11,6 +11,8 @@ class JornadaModel {
   final String? aperturaFecha;
   final String? cierreHora;
   final String? cierreFecha;
+  final String? finProgramado;
+  final String? resultadosProgramado;
   final double totalRecaudado;
   final double recaudadoTotal;
   final String resumen;
@@ -36,6 +38,8 @@ class JornadaModel {
     this.aperturaFecha,
     this.cierreHora,
     this.cierreFecha,
+    this.finProgramado,
+    this.resultadosProgramado,
     this.totalRecaudado = 0.0,
     this.recaudadoTotal = 0.0,
     this.resumen = '',
@@ -71,6 +75,8 @@ class JornadaModel {
       aperturaFecha: json['aperturaFecha'] as String?,
       cierreHora: json['cierreHora'] as String?,
       cierreFecha: json['cierreFecha'] as String?,
+      finProgramado: json['finProgramado'] as String?,
+      resultadosProgramado: json['resultadosProgramado'] as String?,
       totalRecaudado: (json['totalRecaudado'] as num?)?.toDouble() ??
           (json['recaudadoTotal'] as num?)?.toDouble() ?? 0.0,
       recaudadoTotal: (json['recaudadoTotal'] as num?)?.toDouble() ?? 0.0,
