@@ -116,7 +116,7 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
             ),
             const Divider(height: 20),
             // Admin
-            _statusRow(theme, '👤 Admin:', '—', Icons.admin_panel_settings),
+            _statusRow(theme, '👤 Admin:', jornada.adminPhone ?? '—', Icons.admin_panel_settings),
             const SizedBox(height: 4),
             // Lotería
             _statusRow(theme, '🎰 Lotería:', jornada.lottery.isNotEmpty ? jornada.lottery : 'Florida', Icons.casino),
@@ -125,7 +125,7 @@ class _JornadaDetailScreenState extends State<JornadaDetailScreen> {
             _statusRow(theme, '🤖 Automático:', '✅ Activado', Icons.smart_toy),
             const SizedBox(height: 4),
             // Banca
-            _statusRow(theme, '🏦 Banca:', '—', Icons.account_balance),
+            _statusRow(theme, '🏦 Banca:', jornada.tieneBanca ? '✅ Sí' : '❌ No', Icons.account_balance),
             const SizedBox(height: 4),
             // Listeros
             _statusRow(theme, '📋 Listeros:', '${jornada.listerosCount} registrados', Icons.people),

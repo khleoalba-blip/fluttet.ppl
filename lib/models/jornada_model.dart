@@ -24,6 +24,10 @@ class JornadaModel {
   final double totalPremios;
   final Map<String, double> jugadasPorListero;
   final Map<String, ListeroDetalle> listerosDetalle;
+  final String? adminPhone;
+  final bool tieneBanca;
+  final String? bancoGroupJid;
+  final String? groupName;
 
   JornadaModel({
     required this.id,
@@ -51,6 +55,10 @@ class JornadaModel {
     this.totalPremios = 0.0,
     this.jugadasPorListero = const {},
     this.listerosDetalle = const {},
+    this.adminPhone,
+    this.tieneBanca = false,
+    this.bancoGroupJid,
+    this.groupName,
   });
 
   factory JornadaModel.fromJson(Map<String, dynamic> json) {
@@ -93,6 +101,10 @@ class JornadaModel {
       listerosDetalle: json['listerosDetalle'] is Map
           ? (json['listerosDetalle'] as Map).map((k, v) => MapEntry(k.toString(), ListeroDetalle.fromJson(v as Map<String, dynamic>)))
           : {},
+      adminPhone: json['adminPhone'] as String?,
+      tieneBanca: json['tieneBanca'] == true,
+      bancoGroupJid: json['bancoGroupJid'] as String?,
+      groupName: json['groupName'] as String?,
     );
   }
 
